@@ -1,0 +1,140 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/lichungang/claude-plugin-work-dev/main/schema/work-dev.schema.json",
+  "title": "work-dev plugin project config",
+  "description": "Project-level config for claude-plugin-work-dev (.work-dev/config.jsonc). All fields optional; leave empty to use auto-inference from docs/ and tasks/ directories. Two-layer override: plugin defaults + this file.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Optional self-reference to this schema for IDE autocomplete"
+    },
+    "docs_root": {
+      "type": "string",
+      "default": "docs/",
+      "description": "Documentation root directory. Auto-inferred from existence of docs/ documentation/ doc/"
+    },
+    "tasks_root": {
+      "type": "string",
+      "default": "tasks/",
+      "description": "Task document directory. Auto-inferred from existence of tasks/ task/ worklog/"
+    },
+    "code_roots": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": ["src/"],
+      "description": "Code root directories. For monorepo use [\"packages/\"]. Auto-inferred from package.json workspaces / pyproject.toml packages / Cargo.toml workspace"
+    },
+    "modules": {
+      "type": "object",
+      "description": "Module whitelist by category. Empty array = auto-infer from docs/<category>/*.md file names (without .md suffix)",
+      "additionalProperties": false,
+      "properties": {
+        "feature": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Business / functional modules. Auto-inferred from docs/features/*.md"
+        },
+        "stack": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Technical layer / package modules. Auto-inferred from docs/stack/*.md"
+        },
+        "data": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Data schema / API modules. Common values: database, api"
+        },
+        "ops": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Operations modules. Common value: deployment"
+        }
+      }
+    },
+    "strict_modules": {
+      "type": "boolean",
+      "default": false,
+      "description": "true = reject unknown modules with error; false = ask user + create placeholder doc at docs/<category>/<name>.md"
+    },
+    "extra_categories": {
+      "type": "object",
+      "description": "Custom doc categories beyond the canonical 5 (feature/stack/data/ops/decisions)",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["dir", "trigger"],
+        "properties": {
+          "dir": {
+            "type": "string",
+            "description": "Directory path for this category"
+          },
+          "trigger": {
+            "type": "string",
+            "description": "Description of what code change triggers doc sync to this category"
+          }
+        }
+      }
+    },
+    "high_risk_ops_extra": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Project-specific high-risk operations appended to canonical 5 (delete/migration/deployment/auth/payment). Phase 2 impact analysis flags these explicitly."
+    },
+    "project_name": {
+      "type": "string",
+      "description": "Project name for workflow markers and task doc frontmatter. Auto-inferred from git remote name or directory name."
+    },
+    "default_complexity": {
+      "type": "string",
+      "enum": ["light", "standard", "deep"],
+      "default": "standard",
+      "description": "Default complexity when user does not explicitly specify light|standard|deep"
+    },
+    "test_commands": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "description": "Test commands keyed by free-form names. Phase 6 matches changed file's longest path prefix against code_roots[i]/<key>/ to select which key to run. Auto-inferred from package.json scripts / pyproject.toml if absent."
+    },
+    "agent_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Override default agent counts (light=1, standard=2, deep=3). Specifying a tier replaces that tier entirely; unspecified tiers keep defaults.",
+      "properties": {
+        "light":    { "$ref": "#/definitions/agentTriple" },
+        "standard": { "$ref": "#/definitions/agentTriple" },
+        "deep":     { "$ref": "#/definitions/agentTriple" }
+      }
+    },
+    "drift_scan_extra_targets": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Additional drift-scan targets beyond docs_root + README.md. Examples: wiki/, ARCHITECTURE.md, CHANGELOG.md"
+    },
+    "auto_commit": {
+      "type": "boolean",
+      "default": true,
+      "description": "true = Phase 7 commits automatically; false = Phase 7 stages but waits for user approval"
+    },
+    "template_path": {
+      "type": "string",
+      "description": "Task document template path. Default: <tasks_root>/_template.md. Falls back to plugin's templates/_template.md if not found."
+    },
+    "lessons_path": {
+      "type": "string",
+      "description": "Lessons database path. Default: <tasks_root>/_lessons.md. Falls back to plugin's templates/_lessons.md if not found."
+    }
+  },
+  "definitions": {
+    "agentTriple": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "explorer":  { "type": "integer", "minimum": 1 },
+        "architect": { "type": "integer", "minimum": 1 },
+        "reviewer":  { "type": "integer", "minimum": 1 }
+      }
+    }
+  }
+}

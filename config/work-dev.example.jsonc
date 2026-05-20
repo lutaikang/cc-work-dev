@@ -1,0 +1,86 @@
+// .work-dev/config.jsonc — 项目级配置,所有字段可选,留空走自动推断
+// 详细字段说明见 plugin README,JSON Schema 自动补全见 schema/work-dev.schema.json
+//
+// ┌── 顶部加一行让 VS Code 等 IDE 启用 schema 自动补全 ──┐
+// │ "$schema": "../node_modules/claude-plugin-work-dev/schema/work-dev.schema.json",
+// │ 或本地绝对路径,或 GitHub raw URL                      │
+// └────────────────────────────────────────────────┘
+
+{
+  // ─── 路径(默认值即注释,无显式填则按推断规则探测) ───
+  "docs_root":  "docs/",
+  "tasks_root": "tasks/",
+  "code_roots": ["src/"],         // monorepo 填 ["packages/"]
+
+  // ─── 模块白名单 ───
+  // 留空 → 从 docs/<category>/*.md 文件名自动推断
+  // 显式填 → override 自动推断
+  "modules": {
+    "feature":   [],              // e.g. ["auth", "search", "checkout"]
+    "stack":     [],              // e.g. ["backend", "web", "mobile"]
+    "data":      [],              // e.g. ["database", "api"]
+    "ops":       []               // e.g. ["deployment"]
+  },
+
+  // 严格模式:true=白名单外的新模块抛错,要求人工编辑 modules 字段
+  //          false=新模块自动询问 + 建占位文档 docs/<category>/<name>.md
+  "strict_modules": false,
+
+  // ─── 自定义额外类别(规约 5 类不够用时声明) ───
+  "extra_categories": {
+    // "runbook":  { "dir": "docs/runbooks/",  "trigger": "新增 oncall 流程" },
+    // "research": { "dir": "docs/research/",  "trigger": "调研类输出" }
+  },
+
+  // ─── 项目特有的高风险操作(追加到规约默认 5 条:删除/迁移/部署/认证/支付) ───
+  "high_risk_ops_extra": [
+    // "微信 jscode2session / 激活码兑换",
+    // "支付订单状态机变更"
+  ],
+
+  // ─── 项目元信息 ───
+  "project_name": "<project name>",  // 工作流标识行 / 任务文档 frontmatter
+                                     // 不填用 git remote 名或目录名
+
+  // ─── 默认复杂度(用户不显式指定 light/standard/deep 时) ───
+  "default_complexity": "standard",  // "light" | "standard" | "deep"
+
+  // ─── 测试命令(Phase 6 验证用) ───
+  "test_commands": {
+    // key 自由命名(常用 backend / web / frontend / mobile / sdk / ...)
+    // Phase 6 按改动文件最长路径前缀匹配 code_roots[i]/<key>/ 选 key 运行
+    //
+    // 示例(monorepo, code_roots=["packages/"]):
+    //   "backend":  "cd packages/backend && pytest",       // 触发: 改 packages/backend/**
+    //   "web":      "cd packages/web && npm test",         // 触发: 改 packages/web/**
+    //   "frontend": "cd packages/frontend && npm test"
+    //
+    // 示例(单仓 src/, code_roots=["src/"]):
+    //   "unit":     "npm test"                              // 兜底 key,无路径前缀匹配时用
+  },
+
+  // ─── Agent 数量 override(key 为 light / standard / deep 任意一档) ───
+  "agent_counts": {
+    // 缺省值: light={explorer:1, architect:1, reviewer:1}
+    //         standard={explorer:2, architect:2, reviewer:2}
+    //         deep={explorer:3, architect:3, reviewer:3}
+    // 显式填某档则该档全量 override;不填的档保留缺省
+    //
+    // 例(资源敏感项目把 standard 减为各 1):
+    // "standard": { "explorer": 1, "architect": 1, "reviewer": 1 }
+  },
+
+  // ─── drift scan 额外目标(默认扫 docs_root + README.md) ───
+  "drift_scan_extra_targets": [
+    // "wiki/",
+    // "ARCHITECTURE.md",
+    // "CHANGELOG.md"
+  ],
+
+  // ─── 自动 commit 开关 ───
+  "auto_commit": true,  // false 时 Phase 7 只 staged 不 commit,等用户审批
+
+  // ─── 模板 / lessons 文件位置 override(默认相对 tasks_root) ───
+  "template_path": "tasks/_template.md",
+  "lessons_path":  "tasks/_lessons.md"
+}
