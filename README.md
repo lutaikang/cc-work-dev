@@ -2,7 +2,7 @@
 
 通用 **7 阶段开发工作流** Claude Code plugin — 任务文档实时落盘 / docs 漂移自动守门 / light · standard · deep 三档复杂度 / 项目配置化。
 
-> 抽象自 [Work Score 项目 work-dev v3 工作流](https://github.com/lichungang/work_score/blob/main/.claude/commands/work-dev.md),385 行项目定制 → 214 行通用命令 + 15 字段项目配置。
+> 抽象自 [Work Score 项目 work-dev v3 工作流](https://github.com/lutaikang/work_score/blob/main/.claude/commands/work-dev.md),385 行项目定制 → 214 行通用命令 + 15 字段项目配置。
 
 ## 一句话定位
 
@@ -17,13 +17,13 @@
 ### 方式 A:GitHub Release(推荐,M8 发布后可用)
 
 ```bash
-claude plugin install https://github.com/lichungang/cc-work-dev
+claude plugin install https://github.com/lutaikang/cc-work-dev
 ```
 
 ### 方式 B:本地 link(开发阶段 / 调试)
 
 ```bash
-git clone https://github.com/lichungang/cc-work-dev ~/Downloads/cc-work-dev
+git clone https://github.com/lutaikang/cc-work-dev ~/Downloads/cc-work-dev
 ln -s ~/Downloads/cc-work-dev ~/.claude/plugins/local/cc-work-dev
 # 重启 Claude Code 加载
 ```
@@ -179,7 +179,7 @@ project-root/
 
 ```jsonc
 {
-  "$schema": "https://raw.githubusercontent.com/lichungang/cc-work-dev/main/schema/work-dev.schema.json",
+  "$schema": "https://raw.githubusercontent.com/lutaikang/cc-work-dev/main/schema/work-dev.schema.json",
   "project_name": "My Project",
   "test_commands": {
     "backend": "cd packages/backend && pytest",

@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://raw.githubusercontent.com/lichungang/cc-work-dev/main/schema/work-dev.schema.json",
+  "$id": "https://raw.githubusercontent.com/lutaikang/cc-work-dev/main/schema/work-dev.schema.json",
   "title": "cc-work-dev 项目配置",
   "description": "cc-work-dev plugin 的项目级配置(.work-dev/config.jsonc)。所有字段均为可选,留空走自动推断(从 docs/ 与 tasks/ 目录探测)。两层 override:plugin 默认值 + 本文件。",
   "type": "object",
