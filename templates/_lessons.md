@@ -50,6 +50,23 @@ Phase 1 Discovery 召回时按以下顺序查:
 2. 「模块:<当前任务模块>」段(精确匹配,如 `feature/auth` `stack/backend`)
 3. 「跨模块通用」段(无条件读全部)
 
+**实现伪代码**(供 Claude 主流程参考):
+
+```bash
+# 1. 高频坑段(从 "## 高频坑" 到下一个 "## " 二级标题)
+awk '/^## 高频坑/,/^## (?!高频坑)/' {lessons_path}
+
+# 2. 当前模块段
+awk -v m="$current_module" '
+  $0 ~ "^## 模块:"m"$" {flag=1; next}
+  /^## / && flag {flag=0}
+  flag {print}
+' {lessons_path}
+
+# 3. 跨模块通用段
+awk '/^## 跨模块通用/,/^## (?!跨模块通用)/' {lessons_path}
+```
+
 命中后输出格式:
 
 ```

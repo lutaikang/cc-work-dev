@@ -22,7 +22,7 @@
     },
     "code_roots": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": { "type": "string", "minLength": 1 },
       "default": ["src/"],
       "description": "代码根目录列表。monorepo 项目填 [\"packages/\"]。无显式填写时从 package.json workspaces / pyproject.toml packages / Cargo.toml workspace 推断"
     },
@@ -33,23 +33,28 @@
       "properties": {
         "feature": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": { "type": "string", "minLength": 1 },
           "description": "业务 / 功能模块。自动推断来源:docs/features/*.md"
         },
         "stack": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": { "type": "string", "minLength": 1 },
           "description": "技术栈 / 包 / 进程层模块。自动推断来源:docs/stack/*.md"
         },
         "data": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": { "type": "string", "minLength": 1 },
           "description": "数据 schema / API 模块。常见值:database、api"
         },
         "ops": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": { "type": "string", "minLength": 1 },
           "description": "运维 / 部署模块。常见值:deployment"
+        },
+        "decisions": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "重大架构决策 ADR。自动推断来源:docs/decisions/*.md(条目通常为 YYYY-MM-DD-slug 形式,非任务模块,仅用于 drift scan 与新建 ADR 时的路径校验)"
         }
       }
     },

@@ -18,6 +18,17 @@ argument-hint: [light|standard|deep] <feature/bug 描述>
 
 ---
 
+## 0. 子命令路由
+
+**入口分支(必先判断,优先于复杂度解析)**:
+
+- 若 `$ARGUMENTS` trim 后**首 token == `init`**(可后跟空白或行尾) → 跳到 §11 `/work-dev init` 子命令流程执行,执行完毕即退出,**不进入下方 7 phase**。
+- 否则继续 §1,按 `light` / `standard` / `deep` 解析复杂度并走 Phase 1-7。
+
+`init` 之外的子命令暂未保留;若首 token 非 `light` / `standard` / `deep` / `init`,视作复杂度未指定,直接把整个 `$ARGUMENTS` 当任务描述,复杂度走 `{config.default_complexity}`(默认 `standard`)。
+
+---
+
 ## 1. 全局纪律
 
 1. **复杂度手动指定**:`/work-dev light <描述>` / `/work-dev standard <描述>` / `/work-dev deep <描述>`。未指定时走 `{config.default_complexity}`(默认 `standard`)。三档含义详见 plugin README。
@@ -30,7 +41,7 @@ argument-hint: [light|standard|deep] <feature/bug 描述>
 8. **不臆造**:引用行号前 `grep -n` 校准,不发明 API / 函数名 / 行号。
 9. **agent 数随复杂度**:explorer / architect / reviewer 三类,light 各 1 / standard 各 2 / deep 各 3(可被 `{config.agent_counts.<complexity>}` override)。
 10. **中断恢复**:用户回话简短(如"继续")时,先读最新 `{tasks_root}/*.md` 的 frontmatter `phase` + `status` 定位阶段。
-11. **工作流标识行**:每次回复**第一行**输出 `[work-dev v3 / <complexity> / Phase N]`(例:`[work-dev v3 / standard / Phase 4]`)。Phase 7 commit 后到下次启动前不再输出。
+11. **工作流标识行**:每次回复**第一行**输出 `[work-dev v3 / <complexity> / Phase N]`(例:`[work-dev v3 / standard / Phase 4]`)。当复杂度走的是 `{config.default_complexity}` 兜底(用户未显式指定)时,在档位后追加 ` (default)` 提示,如 `[work-dev v3 / standard (default) / Phase 1]`。Phase 7 commit 后到下次启动前不再输出。
 
 ---
 
@@ -93,10 +104,11 @@ argument-hint: [light|standard|deep] <feature/bug 描述>
 **步骤**:
 
 1. **启动 architect 并行**(数量按 §1 第 9 条):
-   - light:1 个(直接出方案)
-   - standard:2 个(A minimal change + B pragmatic balance)
-   - deep:3 个(A minimal + B clean architecture + C pragmatic balance)
-   - 每个 agent 返回完整 blueprint + 必读文件清单(5-10 个)
+   - light:1 个(直接出方案,sole architect → full mode)
+   - standard:2 个(A minimal-diff + B refactor-with-feature,compact mode:仅 §2/§4/§9)
+   - deep:3 个(A minimal-diff + B refactor-with-feature + C defer-tech-debt-only,compact mode)
+   - compact mode 用于节约多 agent 并行上下文;用户选定方案后,主流程再让获选 architect 以 `mode: full` 补出 §6/§7/§8 进任务文档
+   - 每个 agent 返回完整 blueprint(或 compact 三块)+ 必读文件清单(5-10 个)
 2. **对比 + 推荐**:输出方案对比表(方案 / 关键决策 / 优 / 劣)+ 推荐项 + 理由(复杂度 vs 价值 / 一致性 / 维护成本 / 紧急程度)。只有 1 个合理方案时显式说"评估了 X/Y/Z 都不行,只 A 合理,理由..."。
 3. **落盘任务文档完整内容**:第 6/7/8 节 + frontmatter `phase: 4` / `status: confirmed`。**必须在 AskUserQuestion 之前落盘**,确保中断时磁盘有完整方案。
 4. **AskUserQuestion(必用节点 1/2)**:`开干 A` / `开干 B` / `改方案` / `取消`
@@ -147,15 +159,22 @@ argument-hint: [light|standard|deep] <feature/bug 描述>
 
 **步骤**:
 
-1. **docs 漂移扫描(自动守门员)**:从 `git diff` 提取本任务改动的代码符号(函数名 / 类名 / 常量名 / 配置项 / API 路径 / 数据库字段)。对每个符号执行:
+1. **docs 漂移扫描(自动守门员)**:从 `git diff` 提取本任务改动的代码符号(函数名 / 类名 / 常量名 / 配置项 / API 路径 / 数据库字段)。
+
+   **符号过滤规则**(防误报 + 防注入):
+   - 长度 ≥3 字符,丢弃 `is` / `id` / `fn` 之类过短词
+   - 只保留正则 `^[A-Za-z_][A-Za-z0-9_]*$` 命名的标识符(以及 `/api/...` 形式的 API 路径整段当作字面串)
+   - 含 shell 特殊字符(`;` / `$` / `` ` `` / `&` / `|` / `<` / `>` / 反斜杠 / 引号)→ 跳过
+
+   对每个保留下来的符号执行(注意 `--` 终止 flag 解析,`-F` 走字面串,`-w` 单词边界防子串误命中):
    ```
-   grep -rn "<symbol>" {docs_root}/ README.md {config.drift_scan_extra_targets[]}
+   grep -rnwF -- "<symbol>" {docs_root}/ README.md {config.drift_scan_extra_targets[]}
    ```
    列出"代码改了但 docs 仍是旧描述"的位置清单。
 2. **同步 docs**:
    - `standard` / `deep`:Claude 主动 Edit 同步,不再问
    - `light`:输出清单给用户决定
-   - 同步完后再次 grep 校验,应为空或仅命中历史归档段
+   - 同步完后再次 `grep -rnwF --` 校验,应为空或仅命中历史归档段
 3. **复盘提炼**:默认 1-2 句话摘要写入第 11 节"摘要";若用户喊 `retro` 走完整 6 题(4 枚举 + 2 叙述)。无论哪种,提炼 1-2 条规则:
    - 检查 `{lessons_path}` 是否已有同类条目
    - 已有 → 触发次数 +1;触发次数 ≥3 自动移到顶部「高频坑」段

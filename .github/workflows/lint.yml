@@ -1,0 +1,106 @@
+name: lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  schema:
+    name: JSON Schema + JSONC example
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install ajv-cli
+        run: npm install -g ajv-cli@5
+      - name: Strip JSONC comments + drop $schema, then validate
+        run: |
+          set -euo pipefail
+          node -e '
+            const fs = require("fs");
+            let s = fs.readFileSync("config/work-dev.example.jsonc", "utf8");
+            // strip /* ... */ blocks
+            s = s.replace(/\/\*[\s\S]*?\*\//g, "");
+            // strip // line comments (naive but adequate for our example)
+            s = s.replace(/^\s*\/\/.*$/gm, "");
+            s = s.replace(/([^:"])\s*\/\/[^\n]*$/gm, "$1");
+            // remove trailing commas before } or ]
+            s = s.replace(/,(\s*[}\]])/g, "$1");
+            const obj = JSON.parse(s);
+            delete obj["$schema"];
+            fs.writeFileSync("/tmp/example.json", JSON.stringify(obj, null, 2));
+          '
+          ajv validate -s schema/work-dev.schema.json -d /tmp/example.json --spec=draft7 --strict=false
+      - name: Schema self-validity
+        run: |
+          node -e 'JSON.parse(require("fs").readFileSync("schema/work-dev.schema.json", "utf8"))'
+
+  links:
+    name: Markdown link check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --no-progress
+            --max-redirects 5
+            --exclude-path .github
+            --exclude '^https://github\.com/lutaikang/cc-work-dev/(releases|raw)'
+            './**/*.md'
+          fail: false
+
+  frontmatter:
+    name: Agent / Skill frontmatter
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install PyYAML
+        run: pip install --quiet PyYAML
+      - name: Check required frontmatter fields
+        run: |
+          python3 - <<'PY'
+          import os, sys, yaml, glob
+          fail = 0
+
+          def extract_frontmatter(path):
+              with open(path, encoding="utf-8") as f:
+                  text = f.read()
+              if not text.startswith("---"):
+                  return None
+              parts = text.split("---", 2)
+              if len(parts) < 3:
+                  return None
+              try:
+                  return yaml.safe_load(parts[1]) or {}
+              except yaml.YAMLError as e:
+                  print(f"::error file={path}::invalid YAML frontmatter: {e}")
+                  return None
+
+          required = {
+              "agents/*.md": ["name", "description", "tools", "model"],
+              "skills/*/SKILL.md": ["name", "description"],
+              "commands/*.md": ["description"],
+          }
+
+          for pattern, fields in required.items():
+              for path in glob.glob(pattern):
+                  fm = extract_frontmatter(path)
+                  if fm is None:
+                      print(f"::error file={path}::missing or invalid frontmatter")
+                      fail = 1
+                      continue
+                  for k in fields:
+                      v = fm.get(k)
+                      if v is None or v == "":
+                          print(f"::error file={path}::missing frontmatter field: {k}")
+                          fail = 1
+          sys.exit(fail)
+          PY

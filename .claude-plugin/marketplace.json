@@ -2,11 +2,11 @@
   "name": "work-dev-local",
   "owner": {
     "name": "lichungang",
-    "email": "luzhande@163.com"
+    "url": "https://github.com/lutaikang"
   },
   "metadata": {
-    "description": "cc-work-dev 的本地开发版 marketplace(尚未发布到 GitHub;M8 将替换为 GitHub 托管版本)",
-    "version": "0.0.1"
+    "description": "cc-work-dev 的本地开发版 marketplace(发布版本对齐 plugin.json)",
+    "version": "0.1.0"
   },
   "plugins": [
     {

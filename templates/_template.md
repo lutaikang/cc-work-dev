@@ -3,7 +3,7 @@ title: <任务标题,简短动词开头>
 module: <见下方白名单>
 status: draft
 phase: 1
-complexity: light | standard | deep
+complexity: standard  # light | standard | deep
 created: YYYY-MM-DD HH:MM
 last-updated: YYYY-MM-DD HH:MM
 ---

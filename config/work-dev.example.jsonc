@@ -19,7 +19,8 @@
     "feature":   [],              // e.g. ["auth", "search", "checkout"]
     "stack":     [],              // e.g. ["backend", "web", "mobile"]
     "data":      [],              // e.g. ["database", "api"]
-    "ops":       []               // e.g. ["deployment"]
+    "ops":       [],              // e.g. ["deployment"]
+    "decisions": []               // ADR 条目,通常为 YYYY-MM-DD-slug;留空走 docs/decisions/*.md 推断
   },
 
   // 严格模式:true=白名单外的新模块抛错,要求人工编辑 modules 字段

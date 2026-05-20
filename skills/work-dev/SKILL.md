@@ -39,3 +39,8 @@ This skill is the description-based entry point for the `cc-work-dev` plugin. Fo
 6. 项目配置从 `.work-dev/config.jsonc` 读(可选,无则自动推断)
 
 读 `commands/work-dev.md` 后按其指令执行,不要在本 skill 文件中复述流程细节。
+
+## Skill 与 Command 的关系
+
+- 用户输入显式斜杠命令 `/work-dev ...` 时,**以 `commands/work-dev.md` 为唯一入口**,本 skill 不应再独立触发(避免双重 prompt 注入)。
+- 用户用自然语言描述任务时,本 skill 提供 description-based 触发,触发后立即引用 `commands/work-dev.md` 的流程,不再复述。

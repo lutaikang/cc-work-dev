@@ -6,7 +6,7 @@
 
 通用 **7 阶段开发工作流** Claude Code plugin。把不规范的"开发对话"约束成强结构、可中断恢复、自动同步 docs 的工作流。
 
-抽象自 [Work Score 项目 work-dev v3](https://github.com/lutaikang/work_score)(385 行项目定制 → 214 行通用命令 + 15 字段项目配置)。
+基于一个内部开发工作流抽象而来:从 385 行项目定制流程整理为 214 行通用命令 + 15 字段项目配置。
 
 ## ✨ 核心特性
 
@@ -27,7 +27,7 @@
 | Template | 2 | `_template.md`(任务文档骨架)+ `_lessons.md`(教训库骨架) |
 | Config | 1 | `config/work-dev.example.jsonc` 15 字段全示例 |
 | Schema | 1 | `schema/work-dev.schema.json` draft-07 中文注释 |
-| Docs | 1 | README.md 11 章节 / 477 行 |
+| Docs | 1 | README.md 11 章节完整使用说明 |
 
 ## 🚀 安装
 
@@ -40,8 +40,9 @@ claude plugin install https://github.com/lutaikang/cc-work-dev
 ### 本地开发
 
 ```bash
-git clone https://github.com/lutaikang/cc-work-dev ~/Downloads/cc-work-dev
-claude plugin marketplace add ~/Downloads/cc-work-dev
+# <local-path> 自选,如 ~/dev、~/code 等
+git clone https://github.com/lutaikang/cc-work-dev <local-path>/cc-work-dev
+claude plugin marketplace add <local-path>/cc-work-dev
 claude plugin install cc-work-dev@work-dev-local --scope <user|project>
 ```
 
@@ -68,7 +69,7 @@ claude plugin install cc-work-dev@work-dev-local --scope <user|project>
 
 - agent 设计参考 [feature-dev](https://github.com/anthropics/claude-plugins-official) 3 个 agent(code-explorer/architect/reviewer)
 - brainstorming + spec 流程:[superpowers](https://github.com/anthropics/skills) 套件
-- 完整设计 ADR:[2026-05-20-work-dev-plugin-config-interface](https://github.com/lutaikang/work_score/blob/main/docs/decisions/2026-05-20-work-dev-plugin-config-interface.md)
+- 完整设计 ADR 将在后续版本拷贝到本 repo `docs/decisions/`
 
 ## 📜 License
 

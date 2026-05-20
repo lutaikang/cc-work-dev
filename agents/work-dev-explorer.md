@@ -44,10 +44,12 @@ The work-dev orchestrator depends on a specific output shape — provide each se
 ### 1. Essential Files List (5-10 entries)
 
 ```
-- path/to/file.ts:NNN-MMM  — role: <one-line responsibility>
-- path/to/other.py:KKK-LLL — role: <one-line responsibility>
+- path/to/file.ts:NNN     — role: <one-line responsibility>(NNN = entry line from grep -n)
+- path/to/other.py:KKK    — role: <one-line responsibility>
 ...
 ```
+
+If a file's relevant span is contiguous, you MAY append `..MMM` to mark the end line (e.g. `file.ts:120..180`). When the end line is uncertain, output the start line only and add `(±NN)` as approximate span. **Never invent end lines for the sake of format symmetry.**
 
 These files will be read in full by the work-dev main flow before Phase 5 implementation. **Use real `grep -n` line numbers, never invent them.**
 

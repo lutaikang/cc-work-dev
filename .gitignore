@@ -1,3 +1,30 @@
+# macOS / Windows / Linux 桌面元数据
 .DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# 依赖与构建产物
 node_modules/
+dist/
+build/
+coverage/
+
+# 日志与临时文件
 *.log
+*.tmp
+*.bak
+
+# 环境变量与密钥(请勿提交)
+.env
+.env.*
+!.env.example
+
+# IDE / 编辑器
+.vscode/
+.idea/
+*.iml
+
+# Claude Code 本地 settings(各自机器独立)
+.claude/settings.local.json
