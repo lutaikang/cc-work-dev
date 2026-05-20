@@ -1,0 +1,9 @@
+{
+  "name": "claude-plugin-work-dev",
+  "version": "0.0.1",
+  "description": "7-phase development workflow plugin — task doc auto-persistence, docs drift guard, light/standard/deep complexity tiers, modular project config",
+  "author": {
+    "name": "lichungang",
+    "email": "luzhande@163.com"
+  }
+}
