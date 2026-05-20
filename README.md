@@ -1,4 +1,4 @@
-# claude-plugin-work-dev
+# cc-work-dev
 
 通用 **7 阶段开发工作流** Claude Code plugin — 任务文档实时落盘 / docs 漂移自动守门 / light · standard · deep 三档复杂度 / 项目配置化。
 
@@ -17,14 +17,14 @@
 ### 方式 A:GitHub Release(推荐,M8 发布后可用)
 
 ```bash
-claude plugin install https://github.com/lichungang/claude-plugin-work-dev
+claude plugin install https://github.com/lichungang/cc-work-dev
 ```
 
 ### 方式 B:本地 link(开发阶段 / 调试)
 
 ```bash
-git clone https://github.com/lichungang/claude-plugin-work-dev ~/Downloads/claude-plugin-work-dev
-ln -s ~/Downloads/claude-plugin-work-dev ~/.claude/plugins/local/claude-plugin-work-dev
+git clone https://github.com/lichungang/cc-work-dev ~/Downloads/cc-work-dev
+ln -s ~/Downloads/cc-work-dev ~/.claude/plugins/local/cc-work-dev
 # 重启 Claude Code 加载
 ```
 
@@ -32,7 +32,7 @@ ln -s ~/Downloads/claude-plugin-work-dev ~/.claude/plugins/local/claude-plugin-w
 
 ```bash
 claude plugin list | grep work-dev
-# 应输出:claude-plugin-work-dev (✓ Connected)
+# 应输出:cc-work-dev (✓ Connected)
 ```
 
 并且工具列表中应包含 `/work-dev` 斜杠命令。
@@ -179,7 +179,7 @@ project-root/
 
 ```jsonc
 {
-  "$schema": "https://raw.githubusercontent.com/lichungang/claude-plugin-work-dev/main/schema/work-dev.schema.json",
+  "$schema": "https://raw.githubusercontent.com/lichungang/cc-work-dev/main/schema/work-dev.schema.json",
   "project_name": "My Project",
   "test_commands": {
     "backend": "cd packages/backend && pytest",
@@ -434,7 +434,7 @@ Phase 7 走完所有 docs 同步和任务文档更新,但 commit 那一步停下
 ## 9. 项目结构
 
 ```
-claude-plugin-work-dev/
+cc-work-dev/
 ├── .claude-plugin/plugin.json     # name / version / description / author
 ├── commands/work-dev.md           # 7 phase 主流程,~214 行
 ├── skills/work-dev/SKILL.md       # description 语义触发入口

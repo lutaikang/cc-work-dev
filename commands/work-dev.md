@@ -1,6 +1,6 @@
 ---
-description: 7-phase development workflow with task-doc auto-persistence, docs-drift guard, and project-aware config
-argument-hint: [light|standard|deep] <feature/bug description>
+description: 7 阶段开发工作流 — 任务文档实时落盘、docs 漂移自动守门、项目配置化
+argument-hint: [light|standard|deep] <feature/bug 描述>
 ---
 
 # /work-dev v3 — 通用 7 阶段开发工作流

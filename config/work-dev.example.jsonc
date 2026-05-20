@@ -2,7 +2,7 @@
 // 详细字段说明见 plugin README,JSON Schema 自动补全见 schema/work-dev.schema.json
 //
 // ┌── 顶部加一行让 VS Code 等 IDE 启用 schema 自动补全 ──┐
-// │ "$schema": "../node_modules/claude-plugin-work-dev/schema/work-dev.schema.json",
+// │ "$schema": "../node_modules/cc-work-dev/schema/work-dev.schema.json",
 // │ 或本地绝对路径,或 GitHub raw URL                      │
 // └────────────────────────────────────────────────┘
 

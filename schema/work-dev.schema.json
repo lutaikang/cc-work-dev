@@ -1,66 +1,66 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://raw.githubusercontent.com/lichungang/claude-plugin-work-dev/main/schema/work-dev.schema.json",
-  "title": "work-dev plugin project config",
-  "description": "Project-level config for claude-plugin-work-dev (.work-dev/config.jsonc). All fields optional; leave empty to use auto-inference from docs/ and tasks/ directories. Two-layer override: plugin defaults + this file.",
+  "$id": "https://raw.githubusercontent.com/lichungang/cc-work-dev/main/schema/work-dev.schema.json",
+  "title": "cc-work-dev 项目配置",
+  "description": "cc-work-dev plugin 的项目级配置(.work-dev/config.jsonc)。所有字段均为可选,留空走自动推断(从 docs/ 与 tasks/ 目录探测)。两层 override:plugin 默认值 + 本文件。",
   "type": "object",
   "additionalProperties": false,
   "properties": {
     "$schema": {
       "type": "string",
-      "description": "Optional self-reference to this schema for IDE autocomplete"
+      "description": "可选,指向本 schema 的自引用,用于 IDE 自动补全"
     },
     "docs_root": {
       "type": "string",
       "default": "docs/",
-      "description": "Documentation root directory. Auto-inferred from existence of docs/ documentation/ doc/"
+      "description": "文档根目录。无显式填写时自动探测存在性:docs/ → documentation/ → doc/"
     },
     "tasks_root": {
       "type": "string",
       "default": "tasks/",
-      "description": "Task document directory. Auto-inferred from existence of tasks/ task/ worklog/"
+      "description": "任务文档根目录。无显式填写时自动探测:tasks/ → task/ → worklog/"
     },
     "code_roots": {
       "type": "array",
       "items": { "type": "string" },
       "default": ["src/"],
-      "description": "Code root directories. For monorepo use [\"packages/\"]. Auto-inferred from package.json workspaces / pyproject.toml packages / Cargo.toml workspace"
+      "description": "代码根目录列表。monorepo 项目填 [\"packages/\"]。无显式填写时从 package.json workspaces / pyproject.toml packages / Cargo.toml workspace 推断"
     },
     "modules": {
       "type": "object",
-      "description": "Module whitelist by category. Empty array = auto-infer from docs/<category>/*.md file names (without .md suffix)",
+      "description": "各类别下的模块白名单。空数组 = 自动从 docs/<category>/*.md 文件名(去 .md 后缀)推断",
       "additionalProperties": false,
       "properties": {
         "feature": {
           "type": "array",
           "items": { "type": "string" },
-          "description": "Business / functional modules. Auto-inferred from docs/features/*.md"
+          "description": "业务 / 功能模块。自动推断来源:docs/features/*.md"
         },
         "stack": {
           "type": "array",
           "items": { "type": "string" },
-          "description": "Technical layer / package modules. Auto-inferred from docs/stack/*.md"
+          "description": "技术栈 / 包 / 进程层模块。自动推断来源:docs/stack/*.md"
         },
         "data": {
           "type": "array",
           "items": { "type": "string" },
-          "description": "Data schema / API modules. Common values: database, api"
+          "description": "数据 schema / API 模块。常见值:database、api"
         },
         "ops": {
           "type": "array",
           "items": { "type": "string" },
-          "description": "Operations modules. Common value: deployment"
+          "description": "运维 / 部署模块。常见值:deployment"
         }
       }
     },
     "strict_modules": {
       "type": "boolean",
       "default": false,
-      "description": "true = reject unknown modules with error; false = ask user + create placeholder doc at docs/<category>/<name>.md"
+      "description": "true=白名单外的新模块抛错;false=询问用户 + 自动建占位文档 docs/<category>/<name>.md"
     },
     "extra_categories": {
       "type": "object",
-      "description": "Custom doc categories beyond the canonical 5 (feature/stack/data/ops/decisions)",
+      "description": "规约 5 类(feature/stack/data/ops/decisions)之外的自定义类别",
       "additionalProperties": {
         "type": "object",
         "additionalProperties": false,
@@ -68,11 +68,11 @@
         "properties": {
           "dir": {
             "type": "string",
-            "description": "Directory path for this category"
+            "description": "该类别的目录路径"
           },
           "trigger": {
             "type": "string",
-            "description": "Description of what code change triggers doc sync to this category"
+            "description": "什么样的代码改动会触发同步该类别 docs"
           }
         }
       }
@@ -80,27 +80,27 @@
     "high_risk_ops_extra": {
       "type": "array",
       "items": { "type": "string" },
-      "description": "Project-specific high-risk operations appended to canonical 5 (delete/migration/deployment/auth/payment). Phase 2 impact analysis flags these explicitly."
+      "description": "项目特有的高风险操作清单,追加到规约默认 5 条(删除 / 迁移 / 部署 / 认证 / 支付)。Phase 2 影响面分析时显式标注"
     },
     "project_name": {
       "type": "string",
-      "description": "Project name for workflow markers and task doc frontmatter. Auto-inferred from git remote name or directory name."
+      "description": "项目名,用于工作流标识行和任务文档 frontmatter。无显式填写时从 git remote 名或目录名推断"
     },
     "default_complexity": {
       "type": "string",
       "enum": ["light", "standard", "deep"],
       "default": "standard",
-      "description": "Default complexity when user does not explicitly specify light|standard|deep"
+      "description": "用户未显式指定 light|standard|deep 时使用的默认复杂度"
     },
     "test_commands": {
       "type": "object",
       "additionalProperties": { "type": "string" },
-      "description": "Test commands keyed by free-form names. Phase 6 matches changed file's longest path prefix against code_roots[i]/<key>/ to select which key to run. Auto-inferred from package.json scripts / pyproject.toml if absent."
+      "description": "测试命令字典,key 自由命名(常用 backend / web / frontend / mobile / sdk)。Phase 6 按改动文件最长路径前缀匹配 code_roots[i]/<key>/ 来选择 key 运行。无显式填写时从 package.json scripts / pyproject.toml 推断"
     },
     "agent_counts": {
       "type": "object",
       "additionalProperties": false,
-      "description": "Override default agent counts (light=1, standard=2, deep=3). Specifying a tier replaces that tier entirely; unspecified tiers keep defaults.",
+      "description": "Override 默认 agent 数量(light=1, standard=2, deep=3)。指定某档则该档全量替换,未指定的档保留缺省",
       "properties": {
         "light":    { "$ref": "#/definitions/agentTriple" },
         "standard": { "$ref": "#/definitions/agentTriple" },
@@ -110,20 +110,20 @@
     "drift_scan_extra_targets": {
       "type": "array",
       "items": { "type": "string" },
-      "description": "Additional drift-scan targets beyond docs_root + README.md. Examples: wiki/, ARCHITECTURE.md, CHANGELOG.md"
+      "description": "Phase 7 docs 漂移扫描的额外目标(默认扫 docs_root + README.md)。示例:wiki/、ARCHITECTURE.md、CHANGELOG.md"
     },
     "auto_commit": {
       "type": "boolean",
       "default": true,
-      "description": "true = Phase 7 commits automatically; false = Phase 7 stages but waits for user approval"
+      "description": "true=Phase 7 自动 commit;false=Phase 7 只 staged 不 commit,等用户审批"
     },
     "template_path": {
       "type": "string",
-      "description": "Task document template path. Default: <tasks_root>/_template.md. Falls back to plugin's templates/_template.md if not found."
+      "description": "任务文档模板路径。默认 <tasks_root>/_template.md;若该路径文件不存在则 fallback 到 plugin 内置 templates/_template.md"
     },
     "lessons_path": {
       "type": "string",
-      "description": "Lessons database path. Default: <tasks_root>/_lessons.md. Falls back to plugin's templates/_lessons.md if not found."
+      "description": "教训库路径。默认 <tasks_root>/_lessons.md;若该路径文件不存在则 fallback 到 plugin 内置 templates/_lessons.md"
     }
   },
   "definitions": {

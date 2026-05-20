@@ -5,14 +5,14 @@
     "email": "luzhande@163.com"
   },
   "metadata": {
-    "description": "Local dev marketplace for claude-plugin-work-dev (not yet published to GitHub; M8 will replace this with GitHub-hosted marketplace)",
+    "description": "cc-work-dev 的本地开发版 marketplace(尚未发布到 GitHub;M8 将替换为 GitHub 托管版本)",
     "version": "0.0.1"
   },
   "plugins": [
     {
-      "name": "claude-plugin-work-dev",
+      "name": "cc-work-dev",
       "source": "./",
-      "description": "7-phase development workflow plugin with task doc real-time persistence, docs drift guard, light/standard/deep complexity tiers, and project-aware config (.work-dev/config.jsonc with 15 optional fields)",
+      "description": "7 阶段开发工作流插件 — 任务文档实时落盘、docs 漂移自动守门、light/standard/deep 三档复杂度、项目配置化(.work-dev/config.jsonc 15 个可选字段)",
       "category": "development",
       "tags": ["workflow", "task-doc", "docs-drift-guard", "7-phase", "light-standard-deep"]
     }

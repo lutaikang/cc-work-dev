@@ -1,11 +1,11 @@
 ---
 name: work-dev
-description: Use when the user describes a coding task that benefits from a structured 7-phase development workflow — new features, bug fixes, refactoring, performance work, or any change that needs explore→clarify→design→implement→review→wrap cycle with task-doc persistence and docs-drift guard. Also triggered by explicit `/work-dev light|standard|deep <description>` command invocations.
+description: 当用户描述适合 7 阶段开发工作流的编码任务时调用 — 新功能 / bug 修复 / 重构 / 性能优化等需要走 explore→clarify→design→implement→review→wrap 循环并配合任务文档实时落盘 + docs 漂移守门。也通过 `/work-dev light|standard|deep <描述>` 显式命令触发。
 ---
 
 # work-dev — 通用 7 阶段开发工作流 Skill
 
-This skill is the description-based entry point for the `claude-plugin-work-dev` plugin. For full command behavior, read `commands/work-dev.md` in this plugin and follow it exactly.
+This skill is the description-based entry point for the `cc-work-dev` plugin. For full command behavior, read `commands/work-dev.md` in this plugin and follow it exactly.
 
 ## 触发场景
 
