@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "cc-work-dev 的本地开发版 marketplace(发布版本对齐 plugin.json)",
-    "version": "0.1.0"
+    "version": "0.1.1"
   },
   "plugins": [
     {
