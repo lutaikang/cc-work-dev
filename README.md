@@ -14,7 +14,9 @@
 
 ## 1. 安装
 
-### 方式 A:GitHub Release(推荐,v0.1.0 已发布)
+### 方式 A:GitHub Release(推荐)
+
+最新 release 见 [Releases 页面](https://github.com/lutaikang/cc-work-dev/releases/latest):
 
 ```bash
 claude plugin install https://github.com/lutaikang/cc-work-dev
@@ -79,6 +81,43 @@ Claude 会:
 | 5 | Implement | 按拆解步骤实施,不动任务文档第 7 节,不 commit | (代码) |
 | 6 | Review | 跑测试 + reviewer agent + AskUserQuestion(**必用节点 2/2**) | §9 |
 | 7 | Wrap | docs 漂移自动扫描 + 同步 + 1 个 commit 收口 + 复盘提炼到 lessons | §10/§11 |
+
+**流程图(骨架)**:
+
+```
+   触发                                       ┌─── 回流 ────────────────┐
+   /work-dev <X> ─►  ①Discovery               │                         │
+                          │                   │                         │
+                          ▼                   │ ⚠️ Phase 4 「改方案」    │
+                     ②Explore                 │ ↺ 回 Phase 3 / 4 重出   │
+                          │                   │                         │
+                          ▼                   │ ⚠️ Phase 6 「fix-now」  │
+                     ③Clarify                 │ ↺ 修 → 重跑测试 → re-review│
+                          │                   │                         │
+                          ▼                   │ 任意中断                │
+                     ④Design ⚠️ ──[改方案]────┤ ↺ 输入「继续」,         │
+                          │                   │   读 frontmatter 续跑   │
+                          ▼ 开干              │                         │
+                     ⑤Implement               └─────────────────────────┘
+                          │
+                          ▼
+                     ⑥Review ⚠️ ──[fix-now]──┐
+                          │                  │
+                          │  proceed/later   └► 修代码 → 重跑测试 → 再 review
+                          ▼
+                     ⑦Wrap (drift scan + commit + lessons±1)
+                          │
+                          ▼
+                       任务完成
+```
+
+| 符号 | 含义 |
+|---|---|
+| ⚠️ | AskUserQuestion 必答节点(全程仅 2 次:Phase 4 选方案 / Phase 6 fix-then) |
+| ↺ | 回流分支(改方案 / fix-now 重跑 / 中断恢复) |
+| N (agent×N) | 数量随复杂度:light=1 / standard=2 / deep=3 |
+
+**每个 Phase 完成时**:立刻 Edit 任务文档对应章节 + 同步 frontmatter (`status` / `phase` / `last-updated`) — 意外退出后下次输入「继续」即可自动续跑。
 
 **关键纪律**:Phase 1-6 不强制检查 docs,**Phase 7 守门员自动扫描漂移并同步**;改 X 类代码 → 同步 X 对应 docs(features / stack / data / ops / decisions)。
 
@@ -316,8 +355,8 @@ cc-work-dev 设计成**意外中断不丢工作**:每个 Phase 完成立刻 Edit
 | **Phase 5 想中途 commit** | "我先 commit 这一块" | 默认不 commit;真要 commit 显式说"边做边 commit",§10 会追加说明 |
 | **改完代码忘改 docs** | merge 后被同事问"这个函数干嘛的" | **Phase 7 守门员自动扫**,放心 |
 | **任务文档分裂** | 同一任务建了 `v2 / final / debug` 多个 .md | SSOT 原则严格禁止;Phase 4 改方案时也是 Edit 覆盖原文件,不开派生 |
-| **lessons 库膨胀** | 半年下来 500+ 条规则,没人看 | v0.1.1 的沉淀四问已经卡住了,每任务最多 1 条,凑不出就 0 条 |
-| **多 architect 输出爆炸** | standard 任务上下文被 2 个 architect 撑满 | v0.1.1 已默认 compact mode(仅 §2 + §4 + §9),用户选定后再 full mode 补 |
+| **lessons 库膨胀** | 半年下来 500+ 条规则,没人看 | 沉淀四问已默认卡住准入,每任务最多 1 条,凑不出就 0 条 |
+| **多 architect 输出爆炸** | standard 任务上下文被 2 个 architect 撑满 | 多 agent 并行默认 compact mode(仅 §2 + §4 + §9),用户选定后再 full mode 补 |
 
 ---
 
