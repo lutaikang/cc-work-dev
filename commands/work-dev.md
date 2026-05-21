@@ -37,7 +37,7 @@ argument-hint: [light|standard|deep] <feature/bug 描述>
 4. **任务文档按 phase 实时落盘**:每个 Phase 完成立刻 Edit 到任务文档对应章节,防中断丢失。
 5. **不在 Phase 5 中途 commit**:所有改动留 working tree,Phase 7 一次 commit 收口(例外见 Phase 5 步骤 4)。
 6. **docs 同步由 Phase 7 守门员负责**:Phase 1-6 不强制检查 docs,Phase 7 自动扫描漂移并同步。
-7. **高风险操作识别**:对照项目 CLAUDE.md 高风险清单 + `{config.high_risk_ops_extra}`,Phase 2 影响面分析时显式标注。
+7. **高风险变更识别**:对照项目 CLAUDE.md 高风险清单 + `{config.high_risk_ops_extra}`,Phase 2 影响面分析时显式标注。
 8. **不臆造**:引用行号前 `grep -n` 校准,不发明 API / 函数名 / 行号。
 9. **agent 数随复杂度**:explorer / architect / reviewer 三类,light 各 1 / standard 各 2 / deep 各 3(可被 `{config.agent_counts.<complexity>}` override)。
 10. **中断恢复**:用户回话简短(如"继续")时,先读最新 `{tasks_root}/*.md` 的 frontmatter `phase` + `status` 定位阶段。
@@ -161,12 +161,12 @@ argument-hint: [light|standard|deep] <feature/bug 描述>
 
 1. **docs 漂移扫描(自动守门员)**:从 `git diff` 提取本任务改动的代码符号(函数名 / 类名 / 常量名 / 配置项 / API 路径 / 数据库字段)。
 
-   **符号过滤规则**(防误报 + 防注入):
+   **符号过滤规则**(降低误报 + 确保 grep 参数为字面合法标识符):
    - 长度 ≥3 字符,丢弃 `is` / `id` / `fn` 之类过短词
-   - 只保留正则 `^[A-Za-z_][A-Za-z0-9_]*$` 命名的标识符(以及 `/api/...` 形式的 API 路径整段当作字面串)
-   - 含 shell 特殊字符(`;` / `$` / `` ` `` / `&` / `|` / `<` / `>` / 反斜杠 / 引号)→ 跳过
+   - 只保留**匹配正则 `^[A-Za-z_][A-Za-z0-9_]*$` 的合法标识符**,以及 `/api/...` 形式的 API 路径整段当作字面串
+   - 不匹配上述 allowlist 的符号一律跳过(自动排除非标识符字符)
 
-   对每个保留下来的符号执行(注意 `--` 终止 flag 解析,`-F` 走字面串,`-w` 单词边界防子串误命中):
+   对每个保留下来的符号执行(`-F` 走字面串 / `-w` 单词边界防子串误命中 / `--` 终止 flag 解析):
    ```
    grep -rnwF -- "<symbol>" {docs_root}/ README.md {config.drift_scan_extra_targets[]}
    ```
@@ -227,9 +227,9 @@ argument-hint: [light|standard|deep] <feature/bug 描述>
 2. 交互式问技术栈、模块白名单(填进 `.work-dev/config.jsonc`)
 3. 拷贝 plugin 内置 `templates/_template.md` `templates/_lessons.md` 到 `{tasks_root}/`
 4. 生成 `{docs_root}/{features,stack,data,ops,decisions}/.gitkeep`
-5. 在 README.md 注入「## 文档索引」段(指向 `{docs_root}/`)
-6. 在 CLAUDE.md(无则创建)注入「## 文档同步规则」段(从规约渲染)
-7. 在 CLAUDE.md 注入「## 高风险操作清单」段(默认 5 条 + 用户补)
+5. 在 README.md 追加「## 文档索引」段(指向 `{docs_root}/`)
+6. 在 CLAUDE.md(无则创建)追加「## 文档同步规则」段(从规约渲染)
+7. 在 CLAUDE.md 追加「## 高风险变更清单」段(默认 5 条 + 用户补)
 
 执行完毕后,该项目即可走完整 7 phase 流程。
 

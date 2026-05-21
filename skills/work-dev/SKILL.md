@@ -42,5 +42,5 @@ This skill is the description-based entry point for the `cc-work-dev` plugin. Fo
 
 ## Skill 与 Command 的关系
 
-- 用户输入显式斜杠命令 `/work-dev ...` 时,**以 `commands/work-dev.md` 为唯一入口**,本 skill 不应再独立触发(避免双重 prompt 注入)。
+- 用户输入显式斜杠命令 `/work-dev ...` 时,**以 `commands/work-dev.md` 为唯一入口**,本 skill 不应再独立触发(避免重复加载同一流程 prompt)。
 - 用户用自然语言描述任务时,本 skill 提供 description-based 触发,触发后立即引用 `commands/work-dev.md` 的流程,不再复述。

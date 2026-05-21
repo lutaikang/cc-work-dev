@@ -128,13 +128,13 @@ Claude 会:
 
 ### 3.5 docs 漂移自动守门
 
-Phase 7 从 `git diff` 提取改动符号(函数 / 类 / 常量 / 配置项 / API 路径 / DB 字段),先按规则过滤(长度 ≥3、仅合法标识符 / API 路径、剔除含 shell 特殊字符的项),再对每个符号执行:
+Phase 7 从 `git diff` 提取改动符号(函数 / 类 / 常量 / 配置项 / API 路径 / DB 字段),先按规则过滤(长度 ≥3、仅合法标识符 / API 路径 allowlist、非标识符字符自动排除),再对每个符号执行:
 
 ```bash
 grep -rnwF -- "<symbol>" {docs_root}/ README.md {drift_scan_extra_targets[]}
 ```
 
-`-F` 走字面匹配、`-w` 单词边界、`--` 终止 flag 解析,既防短词误报也防符号注入。
+`-F` 走字面匹配、`-w` 单词边界、`--` 终止 flag 解析,既防短词误报也保证 grep 参数始终是字面合法标识符。
 
 列出"代码改了但 docs 仍是旧描述"的位置:
 - `standard` / `deep`:Claude 主动 Edit 同步,不再问
@@ -216,7 +216,7 @@ project-root/
 | `modules.decisions` | string[] | `[]` | decisions ADR 条目白名单(非任务模块,仅 drift scan 与新建 ADR 路径校验) |
 | `strict_modules` | boolean | `false` | true=新模块抛错;false=询问+建占位 |
 | `extra_categories` | object | `{}` | 自定义类别(规约 5 类外) |
-| `high_risk_ops_extra` | string[] | `[]` | 项目特有高风险操作(追加规约默认 5) |
+| `high_risk_ops_extra` | string[] | `[]` | 项目特有高风险变更(追加规约默认 5;字段名保留 `ops_extra` 兼容历史) |
 | `project_name` | string | (从 git 推断) | 工作流标识 / 任务文档 frontmatter |
 | `default_complexity` | enum | `"standard"` | `light` / `standard` / `deep` |
 | `test_commands` | object | `{}` (推断) | Phase 6 验证命令,key 按路径前缀匹配 |
@@ -249,7 +249,7 @@ project-root/
 | `high_risk_ops_extra` | 无推断 | 空(只用规约默认 5 条) |
 | `strict_modules` | 无推断 | `false` |
 
-**规约默认 5 条高风险操作**(`high_risk_ops_extra` 之外的基线):
+**规约默认 5 条高风险变更**(`high_risk_ops_extra` 之外的基线):
 
 1. 删除文件 / 目录 / 数据库表
 2. 数据库迁移(生产环境)
@@ -286,9 +286,9 @@ project-root/
 2. 交互式问技术栈、模块白名单(填进 `.work-dev/config.jsonc`)
 3. 拷贝 plugin 内置 `templates/_template.md` `templates/_lessons.md` 到 `{tasks_root}/`(若项目内已有同名文件 → 询问保留 / 覆盖 / diff)
 4. 生成 `{docs_root}/{features,stack,data,ops,decisions}/.gitkeep`
-5. 在 README.md 注入「## 文档索引」段(指向 `{docs_root}/`)
-6. 在 CLAUDE.md(无则创建)注入「## 文档同步规则」段(从规约渲染)
-7. 在 CLAUDE.md 注入「## 高风险操作清单」段(默认 5 条 + 用户补)
+5. 在 README.md 追加「## 文档索引」段(指向 `{docs_root}/`)
+6. 在 CLAUDE.md(无则创建)追加「## 文档同步规则」段(从规约渲染)
+7. 在 CLAUDE.md 追加「## 高风险变更清单」段(默认 5 条 + 用户补)
 
 执行完毕后,该项目即可走完整 7 phase 流程。
 

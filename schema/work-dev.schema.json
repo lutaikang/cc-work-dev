@@ -85,7 +85,7 @@
     "high_risk_ops_extra": {
       "type": "array",
       "items": { "type": "string" },
-      "description": "项目特有的高风险操作清单,追加到规约默认 5 条(删除 / 迁移 / 部署 / 认证 / 支付)。Phase 2 影响面分析时显式标注"
+      "description": "项目特有的高风险变更清单,追加到规约默认 5 条(删除 / 迁移 / 部署 / 认证 / 支付)。Phase 2 影响面分析时显式标注"
     },
     "project_name": {
       "type": "string",
